@@ -4,104 +4,94 @@
 
 		</el-header>
 		<el-main>
-			<el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-			  <el-form-item label="密码" prop="pass">
-			    <el-input type="password" v-model="ruleForm.pass" autocomplete="off"></el-input>
-			  </el-form-item>
-			  <el-form-item label="确认密码" prop="checkPass">
-			    <el-input type="password" v-model="ruleForm.checkPass" autocomplete="off"></el-input>
-			  </el-form-item>
-			  <el-form-item label="年龄" prop="age">
-			    <el-input v-model.number="ruleForm.age"></el-input>
-			  </el-form-item>
-			  <el-form-item>
-			    <el-button type="primary" @click="submitForm('ruleForm')">提交</el-button>
-			    <el-button @click="resetForm('ruleForm')">重置</el-button>
-			  </el-form-item>
+			<el-form :model="loginForm" status-icon :rules="rules" ref="loginForm" label-width="100px" class="login-form">
+				<el-form-item label="账号" prop="account">
+					<el-input v-model="loginForm.account"></el-input>
+				</el-form-item>
+				<el-form-item label="密码" prop="password">
+					<el-input type="password" @keyup.enter.native="submitForm('loginForm')" v-model="loginForm.password" autocomplete="off"></el-input>
+				</el-form-item>
+				<el-form-item>
+					<el-button type="primary" @click="submitForm('loginForm')">登陆</el-button>
+				</el-form-item>
 			</el-form>
 		</el-main>
 	</el-container>
 </template>
 
 <script>
+	import { login } from '../request/api.js';
+	import cookie from 'vue-cookie'
 	export default {
-	    data() {
-	      var checkAge = (rule, value, callback) => {
-	        if (!value) {
-	          return callback(new Error('年龄不能为空'));
-	        }
-	        setTimeout(() => {
-	          if (!Number.isInteger(value)) {
-	            callback(new Error('请输入数字值'));
-	          } else {
-	            if (value < 18) {
-	              callback(new Error('必须年满16岁'));
-	            } else {
-	              callback();
-	            }
-	          }
-	        }, 1000);
-	      };
-	      var validatePass = (rule, value, callback) => {
-	        if (value === '') {
-	          callback(new Error('请输入密码'));
-	        } else {
-	          if (this.ruleForm.checkPass !== '') {
-	            this.$refs.ruleForm.validateField('checkPass');
-	          }
-	          callback();
-	        }
-	      };
-	      var validatePass2 = (rule, value, callback) => {
-	        if (value === '') {
-	          callback(new Error('请再次输入密码'));
-	        } else if (value !== this.ruleForm.pass) {
-	          callback(new Error('两次输入密码不一致!'));
-	        } else {
-	          callback();
-	        }
-	      };
-	      return {
-	        ruleForm: {
-	          pass: '',
-	          checkPass: '',
-	          age: ''
-	        },
-	        rules: {
-	          pass: [
-	            { validator: validatePass, trigger: 'blur' }
-	          ],
-	          checkPass: [
-	            { validator: validatePass2, trigger: 'blur' }
-	          ],
-	          age: [
-	            { validator: checkAge, trigger: 'blur' }
-	          ]
-	        }
-	      };
-	    },
-	    methods: {
-	      submitForm(formName) {
-			this.$router.push({ path: '/main'})
-	        this.$refs[formName].validate((valid) => {
-	          if (valid) {
-	            alert('submit!');
-	          } else {
-	            console.log('error submit!!');
-	            return false;
-	          }
-	        });
-	      },
-	      resetForm(formName) {
-	        this.$refs[formName].resetFields();
-	      }
-	    }
-	  }
+		data() {
+			return {
+				loginForm: {
+					account: '',
+					password: ''
+				},
+				rules: {
+					account: [{
+							required: true,
+							message: '请输入账号',
+							trigger: 'blur'
+						},
+						{
+							pattern:/^[a-zA-Z0-9_-]{4,16}$/,
+							message: '4到16位（字母，数字，下划线，减号）',
+							trigger: 'blur'
+						}
+					],
+					password: [{
+							required: true,
+							message: '请输入密码',
+							trigger: 'blur'
+						},
+						{
+							min: 1,
+							max: 30,
+							message: '30个字符',
+							trigger: 'blur'
+						}
+					]
+				}
+			};
+		},
+		methods: {
+			submitForm(formName) {
+				let me = this;
+				this.$refs[formName].validate((valid) => {
+					if (valid) {
+						let promise = login(this.loginForm);
+						promise.then(function(res){
+							console.log(res.data);
+							cookie.set("token",res.data);
+							me.$router.push({
+								path: '/main'
+							});
+						});
+					} else {
+						console.log('error submit!!');
+						return false;
+					}
+				});
+			},
+			resetForm(formName) {
+				this.$refs[formName].resetFields();
+			}
+		}
+	}
 </script>
 
 <style>
 	.logincontainer {
 		height: 100%;
-		background-color: #EEEEEE;
+		background-color: #ABCDEF;
+	}
+
+	.login-form {
+		width: 30%;
+		position: absolute;
+		top: 35%;
+		right: 8%;
 	}
 </style>

@@ -39,6 +39,7 @@
 </template>
 
 <script>
+	import { getuserinfo } from '../../request/api.js';
 	export default {
 		data() {
 			return {
@@ -69,6 +70,8 @@
 		methods: {
 			onSubmit() {
 				console.log('submit!');
+				let result = getuserinfo();
+				console.log(result);
 			},
 			handleSizeChange(val) {
 				console.log(`每页 ${val} 条`);
