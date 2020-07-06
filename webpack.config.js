@@ -48,8 +48,9 @@ module.exports = (options = {}) => ({
       names: ['vendor', 'manifest']
     }),
     new HtmlWebpackPlugin({
-      template: 'src/index.html'
-    })
+      template: 'src/index.html',
+	  favicon: 'src/favicon.ico' 
+    }),
   ],
   resolve: {
     alias: {

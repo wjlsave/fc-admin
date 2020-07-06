@@ -39,7 +39,7 @@
 </template>
 
 <script>
-	import { getuserinfo } from '../../request/api.js';
+	import { getuserinfo } from '~/request/api.js';
 	export default {
 		data() {
 			return {

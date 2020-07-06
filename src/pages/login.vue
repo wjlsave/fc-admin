@@ -1,7 +1,6 @@
 <template>
 	<el-container class="logincontainer">
 		<el-header>
-
 		</el-header>
 		<el-main>
 			<el-form :model="loginForm" status-icon :rules="rules" ref="loginForm" label-width="100px" class="login-form">
@@ -20,7 +19,7 @@
 </template>
 
 <script>
-	import { login } from '../request/api.js';
+	import { login } from '~/request/api.js';
 	import cookie from 'vue-cookie'
 	export default {
 		data() {
