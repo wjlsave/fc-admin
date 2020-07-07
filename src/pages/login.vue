@@ -57,21 +57,16 @@
 		},
 		methods: {
 			submitForm(formName) {
-				let me = this;
-				this.$refs[formName].validate((valid) => {
+				this.$refs[formName].validate(async (valid) => {
 					if (valid) {
-						let promise = login(this.loginForm);
-						promise.then(function(res){
-							console.log(res.data);
-							cookie.set("token",res.data);
-							me.$router.push({
-								path: '/main'
-							});
+						let result = await login(this.loginForm,()=>{
+							this.$refs[formName].resetFields();
 						});
-					} else {
-						console.log('error submit!!');
-						return false;
-					}
+						cookie.set("token",result);
+						this.$router.push({
+							path: '/main'
+						});
+					} 
 				});
 			},
 			resetForm(formName) {

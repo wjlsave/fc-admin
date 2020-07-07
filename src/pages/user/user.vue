@@ -68,9 +68,9 @@
 			}
 		},
 		methods: {
-			onSubmit() {
+			async onSubmit() {
 				console.log('submit!');
-				let result = getuserinfo();
+				let result = await getuserinfo();
 				console.log(result);
 			},
 			handleSizeChange(val) {
