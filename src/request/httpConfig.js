@@ -142,7 +142,7 @@ http.post = function(url, data, options = {
 }
 
 http.get = function(url, data, options = {
-	isShowLoading: false
+	isShowLoading: true
 }) {
 	let loadinginstance;
 	if (options.isShowLoading !== false) {
@@ -154,7 +154,7 @@ http.get = function(url, data, options = {
 	}
 	return new Promise((resolve, reject) => {
 		instance
-			.get(url, data, options)
+			.get(url, {params:data}, options)
 			.then(response => {
 				if (options.isShowLoading !== false) {
 					loadinginstance.close();
@@ -170,6 +170,9 @@ http.get = function(url, data, options = {
 				}
 			})
 			.catch(e => {
+				if (options.isShowLoading !== false) {
+					loadinginstance.close();
+				}
 				reject(e);
 			})
 	})

@@ -17,10 +17,10 @@ export default new VueRouter({
 			component: resolve=>require(["~/pages/main"],resolve),
 			children: [{
 				path: "",
-				redirect: 'user'
+				redirect: 'SysUser'
 			}, {
-				path: "user",
-				component: resolve=>require(["~/pages/user/user"],resolve),
+				path: "SysUser",
+				component: resolve=>require(["~/pages/SysUser/list"],resolve),
 			}]
 		}
 	]
