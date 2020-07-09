@@ -88,6 +88,11 @@ instance.interceptors.response.use(
 
 		} else {
 			err.response = '连接服务器失败';
+			Message({
+				showClose: true,
+				message: err.response,
+				type: 'error'
+			});
 		}
 		return Promise.reject(err.response);
 	}
