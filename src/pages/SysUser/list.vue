@@ -23,16 +23,36 @@
 			</el-table-column>
 			<el-table-column prop="userName" label="姓名" width="180">
 			</el-table-column>
-			<el-table-column prop="createTime" label="创建时间">
+			<el-table-column prop="state" label="状态" width="80" align="center">
+				<template slot-scope="scope">
+					<el-tag :type="scope.row.state === 1 ? 'success' : 'danger'" disable-transitions>{{scope.row.state===1?'启用':'停用'}}</el-tag>
+				</template>
 			</el-table-column>
+			<el-table-column prop="createTime" label="创建时间" width="180" align="center">
+			</el-table-column>
+			<el-table-column prop="lastLoginTime" label="最后登录时间" width="180" align="center">
+			</el-table-column>
+			<el-table-column label="操作" fixed="right" align="center">
+			      <template slot-scope="scope">
+			        <el-button
+			          size="mini"
+					  type="warning"
+			          @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+			        <el-button
+			          size="mini"
+			          type="danger"
+			          @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+			      </template>
+			    </el-table-column>
 		</el-table>
 
 		<el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pageNum"
-		 :page-sizes="[10,20,50,100,1000,10000]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper" :total="total">
+		 :page-sizes="[10,20,50,100,1000,10000]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper"
+		 :total="total">
 		</el-pagination>
-		
-		<el-dialog title="添加用户" :visible.sync="dialogFormVisible" width="800px">
-			<el-form :model="postForm" ref="postForm" :rules="rules" label-width="100px" >
+
+		<el-dialog title="添加用户" :visible.sync="dialogFormVisible" width="800px" @closed="closed" :close-on-click-modal="false">
+			<el-form :model="postForm" ref="postForm" :rules="rules" label-width="100px">
 				<el-form-item label="账户名称" prop="account">
 					<el-input v-model="postForm.account" autocomplete="off"></el-input>
 				</el-form-item>
@@ -40,12 +60,8 @@
 					<el-input v-model="postForm.userName" autocomplete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="启用状态">
-					<el-switch
-					  v-model="postForm.state"
-					  active-color="#13ce66"
-					  inactive-color="#ff4949"
-					  active-value= "1"
-					  inactive-value= "0">
+					<el-switch v-model="postForm.state" active-color="#13ce66" inactive-color="#ff4949" active-value="1"
+					 inactive-value="0">
 					</el-switch>
 				</el-form-item>
 				<el-form-item label="角色选择">
@@ -63,7 +79,11 @@
 
 <script>
 	import {
-		getSysUserpagelist,SysUseradd,getRolepagelist
+		getSysUserPagelist,
+		SysUserAdd,
+		SysUserEdit,
+		SysUserCut,
+		getRolePagelist
 	} from '~/request/api.js';
 	export default {
 		data() {
@@ -74,17 +94,17 @@
 				paramForm: {
 					account: '',
 					userName: '',
-					state: null,
-					roleids:[]
+					state: null
 				},
 				tableData: [],
 				dialogFormVisible: false,
 				postForm: {
 					account: null,
 					userName: null,
-					state: "1"
+					state: "1",
+					roleids: []
 				},
-				rolelist:[],
+				rolelist: [],
 				rules: {
 					account: [{
 							required: true,
@@ -92,7 +112,7 @@
 							trigger: 'blur'
 						},
 						{
-							pattern:/^[a-zA-Z0-9_-]{4,16}$/,
+							pattern: /^[a-zA-Z0-9_-]{4,16}$/,
 							message: '4到16位（字母，数字，下划线，减号）',
 							trigger: 'blur'
 						}
@@ -125,14 +145,17 @@
 					pageSize: this.pageSize
 				}
 				Object.assign(params, this.$util.filterParams(this.paramForm));
-				let result = await getSysUserpagelist(params);
+				let result = await getSysUserPagelist(params);
 				this.tableData = result.list;
 				this.total = result.total;
 			},
 			async getRolelist() {
-				let result = await getRolepagelist({pageNum:1,pageSize:0});
+				let result = await getRolePagelist({
+					pageNum: 1,
+					pageSize: 0
+				});
 				this.rolelist = [];
-				for(let i = 0;i<result.list.length;i++){
+				for (let i = 0; i < result.list.length; i++) {
 					this.rolelist.push({
 						key: result.list[i].id,
 						label: result.list[i].roleName
@@ -148,19 +171,41 @@
 				this.pageNum = val;
 				this.getPageInfo();
 			},
-			cancel(){
-				this.dialogFormVisible =false;
+			cancel() {
+				this.dialogFormVisible = false;
 			},
-			async save(){
+			async save() {
 				this.$refs["postForm"].validate(async (valid) => {
 					if (valid) {
-						this.postForm.roleids = this.postForm.roleids.join(",");
-						let result = await SysUseradd(this.$util.filterParams(this.postForm));
-						this.dialogFormVisible =false;
+						let params = Object.assign({},this.postForm);
+						params.roleids = params.roleids.join(",");
+						let result = await SysUserAdd(this.$util.filterParams(params));
+						this.dialogFormVisible = false;
 						this.$refs["postForm"].resetFields();
 						this.getPageInfo();
-					} 
+					}
 				});
+			},
+			handleEdit(index,row){
+				
+			},
+			handleDelete(index,row){
+				this.$confirm('此操作将永久删除用户信息, 是否继续?', '提示', {
+				          confirmButtonText: '确定',
+				          cancelButtonText: '取消',
+				          type: 'warning'
+				        }).then(async () => {
+				          let result = await SysUserCut({id:row.id});
+						  this.getPageInfo();
+				        }).catch(() => {
+				          this.$message({
+				            type: 'info',
+				            message: '已取消删除'
+				          });
+						});
+			},
+			closed() {
+				this.$refs["postForm"].resetFields();
 			}
 		}
 	}
