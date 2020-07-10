@@ -24,13 +24,6 @@ let instance = axios.create({
 	baseURL,
 	validateStatus(status) {
 		switch (status) {
-			case 400:
-				Message({
-					showClose: true,
-					message: '请求错误(' + status + ')',
-					type: 'error'
-				});
-				break;
 			case 401:
 				Message({
 					showClose: true,
@@ -63,7 +56,7 @@ let instance = axios.create({
 				});
 				break
 		}
-		return status >= 200 && status < 300
+		return (status >= 200 && status < 300)||status==400
 	}
 })
 
@@ -81,6 +74,16 @@ instance.interceptors.request.use(
 // 响应拦截器即异常处理
 instance.interceptors.response.use(
 	response => {
+		if(response.status==400){
+			let title = '参数错误(' + response.status + ')';
+			Notification.error({
+				title: title,
+				dangerouslyUseHTMLString: true,
+				message: response.data.data.join("<br/><br/>"),
+				duration: 0
+			});
+			return Promise.reject(title);
+		}
 		return response.data;
 	},
 	err => {
@@ -103,7 +106,7 @@ http.post = function(url, data, options = {
 	successMessage: "操作成功"
 }, errorMethod) {
 	let loadinginstance;
-	if (options.isShowLoading !== false) {
+	if (options.isShowLoading) {
 		loadinginstance = Loading.service({
 			fullscreen: true,
 			background: 'rgba(0, 0, 0, 0.7)',
@@ -114,7 +117,7 @@ http.post = function(url, data, options = {
 		instance
 			.post(url, qs.stringify(data), options)
 			.then(response => {
-				if (options.isShowLoading !== false) {
+				if (options.isShowLoading) {
 					loadinginstance.close();
 				}
 				if (response.code == 0) {
@@ -138,7 +141,7 @@ http.post = function(url, data, options = {
 				}
 			})
 			.catch(e => {
-				if (options.isShowLoading !== false) {
+				if (options.isShowLoading) {
 					loadinginstance.close();
 				}
 				reject(e);
