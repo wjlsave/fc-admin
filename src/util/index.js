@@ -7,5 +7,13 @@ export default {
 			}
 		}
 		return params;
+	},
+	OverrideObject:(target ,obj) =>{
+		for (let key in target) {
+			if(obj[key]!==undefined ){
+				target[key] = obj[key];
+			}
+		}
+		return target;
 	}
 }

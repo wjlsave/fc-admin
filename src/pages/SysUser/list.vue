@@ -19,20 +19,20 @@
 			</el-form-item>
 		</el-form>
 		<el-table :data="tableData" height="calc(100% - 119px)" border style="width: 100%">
-			<el-table-column prop="account" label="账户" width="180">
+			<el-table-column prop="account" label="账户">
 			</el-table-column>
-			<el-table-column prop="userName" label="姓名" width="180">
+			<el-table-column prop="userName" label="姓名">
 			</el-table-column>
-			<el-table-column prop="state" label="状态" width="80" align="center">
+			<el-table-column prop="state" label="状态" align="center">
 				<template slot-scope="scope">
 					<el-tag :type="scope.row.state === 1 ? 'success' : 'danger'" disable-transitions>{{scope.row.state===1?'启用':'停用'}}</el-tag>
 				</template>
 			</el-table-column>
-			<el-table-column prop="createTime" label="创建时间" width="180" align="center">
+			<el-table-column prop="createTime" label="创建时间" align="center">
 			</el-table-column>
-			<el-table-column prop="lastLoginTime" label="最后登录时间" width="180" align="center">
+			<el-table-column prop="lastLoginTime" label="最后登录时间" align="center">
 			</el-table-column>
-			<el-table-column label="操作" fixed="right" align="center">
+			<el-table-column label="操作" width="200" fixed="right" align="center">
 			      <template slot-scope="scope">
 			        <el-button
 			          size="mini"
@@ -41,7 +41,7 @@
 			        <el-button
 			          size="mini"
 			          type="danger"
-			          @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+			          @click="cut(scope.$index, scope.row)">删除</el-button>
 			      </template>
 			    </el-table-column>
 		</el-table>
@@ -70,7 +70,9 @@
 			</el-form>
 			<div slot="footer" class="dialog-footer">
 				<el-button @click="cancel">取 消</el-button>
-				<el-button type="primary" @click="save">确 定</el-button>
+				<el-button type="primary" @click="add" v-if="editid==null">提 交</el-button>
+				<el-button type="primary" @click="edit" v-if="editid!=null">修 改</el-button>
+				<el-button type="danger" @click="resetpassword" v-if="editid!=null">重置密码</el-button>
 			</div>
 		</el-dialog>
 	</div>
@@ -80,10 +82,12 @@
 <script>
 	import {
 		getSysUserPagelist,
+		SysUserDetail,
 		SysUserAdd,
 		SysUserEdit,
 		SysUserCut,
-		getRolePagelist
+		getRolePagelist,
+		SysUserResetPassword
 	} from '~/request/api.js';
 	export default {
 		data() {
@@ -128,7 +132,8 @@
 							trigger: 'blur'
 						}
 					],
-				}
+				},
+				editid:null
 			}
 		},
 		created() {
@@ -174,22 +179,53 @@
 			cancel() {
 				this.dialogFormVisible = false;
 			},
-			async save() {
+			async add() {
 				this.$refs["postForm"].validate(async (valid) => {
 					if (valid) {
 						let params = Object.assign({},this.postForm);
 						params.roleids = params.roleids.join(",");
 						let result = await SysUserAdd(this.$util.filterParams(params));
 						this.dialogFormVisible = false;
-						this.$refs["postForm"].resetFields();
 						this.getPageInfo();
 					}
 				});
 			},
-			handleEdit(index,row){
-				
+			async edit() {
+				this.$refs["postForm"].validate(async (valid) => {
+					if (valid) {
+						let params = Object.assign({id:this.editid},this.postForm);
+						params.roleids = params.roleids.join(",");
+						let result = await SysUserEdit(this.$util.filterParams(params));
+						this.dialogFormVisible = false;
+						this.getPageInfo();
+					}
+				});
 			},
-			handleDelete(index,row){
+			
+			resetpassword(){
+				this.$confirm('此操作将改变用户密码, 是否继续?', '提示', {
+				          confirmButtonText: '确定',
+				          cancelButtonText: '取消',
+				          type: 'warning'
+				        }).then(async () => {
+				          let result = await SysUserResetPassword({id:this.editid});
+						  this.getPageInfo();
+				        }).catch(() => {
+				          this.$message({
+				            type: 'info',
+				            message: '已取消重置'
+				          });
+						});
+			},
+			async handleEdit(index,row){
+				this.editid = row.id;
+				let result = await SysUserDetail({id:row.id});
+				this.dialogFormVisible = true;
+				this.postForm = this.$util.OverrideObject(this.postForm,result);
+				this.postForm.roleids = result.roleids;
+				this.postForm.state+="";
+			},
+			cut(index,row){
 				this.$confirm('此操作将永久删除用户信息, 是否继续?', '提示', {
 				          confirmButtonText: '确定',
 				          cancelButtonText: '取消',
@@ -206,6 +242,9 @@
 			},
 			closed() {
 				this.$refs["postForm"].resetFields();
+				this.editid = null;
+				this.postForm.rolelids = [];
+				this.postForm.state = "1";
 			}
 		}
 	}

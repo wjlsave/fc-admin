@@ -22,6 +22,9 @@ export default new VueRouter({
 				path: "SysUser",
 				component: resolve=>require(["~/pages/SysUser/list"],resolve),
 			}, {
+				path: "SysResource",
+				component: resolve=>require(["~/pages/SysResource/list"],resolve),
+			}, {
 				path: "welcome",
 				component: resolve=>require(["~/pages/welcome"],resolve),
 			}]

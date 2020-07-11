@@ -120,7 +120,7 @@ http.post = function(url, data, options = {
 				if (options.isShowLoading) {
 					loadinginstance.close();
 				}
-				if (response.code == 0) {
+				if (response.code === 0) {
 					if (options.successMessage) {
 						Notification({
 							title: '成功',
@@ -164,10 +164,10 @@ http.get = function(url, data, options = {
 		instance
 			.get(url, {params:data}, options)
 			.then(response => {
-				if (options.isShowLoading !== false) {
+				if (options.isShowLoading) {
 					loadinginstance.close();
 				}
-				if (response.code == 0) {
+				if (response.code === 0) {
 					resolve(response.data);
 				} else {
 					Notification.error({
@@ -178,7 +178,7 @@ http.get = function(url, data, options = {
 				}
 			})
 			.catch(e => {
-				if (options.isShowLoading !== false) {
+				if (options.isShowLoading) {
 					loadinginstance.close();
 				}
 				reject(e);
