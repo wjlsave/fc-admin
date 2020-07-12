@@ -86,7 +86,7 @@
 		SysUserAdd,
 		SysUserEdit,
 		SysUserCut,
-		getRolePagelist,
+		getSysRolePagelist,
 		SysUserResetPassword
 	} from '~/request/api.js';
 	export default {
@@ -155,7 +155,7 @@
 				this.total = result.total;
 			},
 			async getRolelist() {
-				let result = await getRolePagelist({
+				let result = await getSysRolePagelist({
 					pageNum: 1,
 					pageSize: 0
 				});

@@ -18,4 +18,12 @@ export const SysUserResetPassword = (p) => http.post('SysUser/resetpassword',p,{
 
 export const getSysRolePagelist = (p) => http.get('SysRole/pagelist',p);
 
+export const SysRoleDetail = (p) => http.get('SysRole/detail',p);
+
+export const SysRoleCut = (p) => http.post('SysRole/cut',p,{successMessage:"删除角色成功"});
+
+export const SysRoleAdd = (p) => http.post('SysRole/add',p,{successMessage:"添加角色成功"});
+
+export const SysRoleEdit = (p) => http.post('SysRole/edit',p,{successMessage:"修改角色成功"});
+
 export const getSysResourceTreelist = (p) => http.get('SysResource/treelist',p);
