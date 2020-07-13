@@ -3,28 +3,8 @@
 		<el-header class="main-head"></el-header>
 		<el-container class="main-c2">
 			<el-aside class="main-aside" width="210px">
-				<el-menu default-active="1-1" class="main-menu" @open="handleOpen" @close="handleClose" background-color="#545c64"
-				 text-color="#fff" active-text-color="#ffd04b">
-					<el-submenu index="1">
-						<template slot="title">
-							<i class="el-icon-location"></i>
-							<span>系统配置</span>
-						</template>
-						<el-menu-item index="1-1">用户管理</el-menu-item>
-						<el-menu-item index="1-2">角色管理</el-menu-item>
-					</el-submenu>
-					<el-menu-item index="2">
-						<i class="el-icon-menu"></i>
-						<span slot="title">导航二</span>
-					</el-menu-item>
-					<el-menu-item index="3" disabled>
-						<i class="el-icon-document"></i>
-						<span slot="title">导航三</span>
-					</el-menu-item>
-					<el-menu-item index="4">
-						<i class="el-icon-setting"></i>
-						<span slot="title">导航四</span>
-					</el-menu-item>
+				<el-menu class="main-menu" :router="true" :default-active="$route.name" @open="handleOpen" @close="handleClose" background-color="#545c64" text-color="#fff" active-text-color="#ffd04b">
+					<MenuTree :menuData="menutree"></MenuTree>
 				</el-menu>
 			</el-aside>
 			<el-main class="main-main">
@@ -42,8 +22,47 @@
 </template>
 
 <script>
+	import MenuTree from '~/components/MenuTree'
+	import {
+		getSysResourceOfUser
+	} from '~/request/api.js';
+	
 	export default {
+		components: {
+		  'MenuTree': MenuTree
+		},
+		data(){
+			return {
+				menutree:[]
+			}
+		},
+		created(){
+			this.getResource();
+		},
 	    methods: {
+		  async getResource(){
+		  	let result = await getSysResourceOfUser({userid:6});
+			let buttoncodes = {};
+			let pagecodes = {};
+			let filterMenu = (ary) => {
+				let newary = ary.filter((item)=>{
+					if(item.type==1){
+						if(item.children!=null){
+							item.children = filterMenu(item.children);
+						}
+						pagecodes[item.path] = true;
+						return true;
+					}else{
+						buttoncodes[item.path] = true;
+						return false;
+					}
+				});
+				return newary;
+			} 
+			this.menutree = filterMenu(result);
+			this.$store.commit('setButtonPermission',buttoncodes);
+			this.$store.commit('setPagePermission',pagecodes);
+		  },
 	      handleOpen(key, keyPath) {
 	        console.log(key, keyPath);
 	      },

@@ -3,6 +3,11 @@ import VueRouter from 'vue-router'
 
 Vue.use(VueRouter)
 
+const originalPush = VueRouter.prototype.push
+VueRouter.prototype.push = function push(location) {
+	return originalPush.call(this, location).catch(err => err)
+}
+
 export default new VueRouter({
 	routes: [{
 			path: '/',
@@ -10,26 +15,30 @@ export default new VueRouter({
 		},
 		{
 			path: '/login',
-			component: resolve=>require(["~/pages/login"],resolve),
+			component: resolve => require(["~/pages/login"], resolve),
 		},
 		{
 			path: '/main',
-			component: resolve=>require(["~/pages/main"],resolve),
+			component: resolve => require(["~/pages/main"], resolve),
 			children: [{
 				path: "",
 				redirect: 'welcome'
 			}, {
 				path: "SysUser",
-				component: resolve=>require(["~/pages/SysUser/list"],resolve),
+				name:"SysUser",
+				component: resolve => require(["~/pages/SysUser/list"], resolve),
 			}, {
 				path: "SysRole",
-				component: resolve=>require(["~/pages/SysRole/list"],resolve),
+				name:"SysRole",
+				component: resolve => require(["~/pages/SysRole/list"], resolve),
 			}, {
 				path: "SysResource",
-				component: resolve=>require(["~/pages/SysResource/list"],resolve),
+				name:"SysResource",
+				component: resolve => require(["~/pages/SysResource/list"], resolve),
 			}, {
 				path: "welcome",
-				component: resolve=>require(["~/pages/welcome"],resolve),
+				name:"welcome",
+				component: resolve => require(["~/pages/welcome"], resolve),
 			}]
 		}
 	]

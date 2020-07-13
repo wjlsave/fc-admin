@@ -15,7 +15,7 @@
 			</el-form-item>
 			<el-form-item>
 				<el-button type="primary" @click="search">查询</el-button>
-				<el-button type="primary" icon="el-icon-edit" @click="dialogFormVisible = true">添加</el-button>
+				<el-button type="primary" icon="el-icon-edit" @click="dialogFormVisible = true" v-if="$store.state.ButtonPermission.addSysUser">添加</el-button>
 			</el-form-item>
 		</el-form>
 		<el-table :data="tableData" height="calc(100% - 119px)" border style="width: 100%">
@@ -32,15 +32,17 @@
 			</el-table-column>
 			<el-table-column prop="lastLoginTime" label="最后登录时间" align="center">
 			</el-table-column>
-			<el-table-column label="操作" width="200" fixed="right" align="center">
+			<el-table-column label="操作" width="200" fixed="right" align="center" v-if="$store.state.ButtonPermission.editSysUser||$store.state.ButtonPermission.cutSysUser">
 			      <template slot-scope="scope">
 			        <el-button
 			          size="mini"
 					  type="warning"
+					   v-if="$store.state.ButtonPermission.editSysUser"
 			          @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
 			        <el-button
 			          size="mini"
 			          type="danger"
+					  v-if="$store.state.ButtonPermission.cutSysUser"
 			          @click="cut(scope.$index, scope.row)">删除</el-button>
 			      </template>
 			    </el-table-column>

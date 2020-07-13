@@ -27,3 +27,5 @@ export const SysRoleAdd = (p) => http.post('SysRole/add',p,{successMessage:"添�
 export const SysRoleEdit = (p) => http.post('SysRole/edit',p,{successMessage:"修改角色成功"});
 
 export const getSysResourceTreelist = (p) => http.get('SysResource/treelist',p);
+
+export const getSysResourceOfUser = (p) => http.get('SysResource/getuserresource',p);
