@@ -10,8 +10,16 @@ Vue.prototype.$util = util;
 Vue.use(ElementUI);
 
 router.beforeEach((to,from,next)=>{
-	console.log(to);
-	next();
+	if (to.matched.length===0){
+		next({path:"notFound"});
+	}else{
+		if(to.meta.validate===true&&store.state.hasinit&&store.state.PagePermission[to.name]!==true){
+			next({name:"noAuth"});
+		}else{
+			next();
+		}
+	}
+	
 });
 
 new Vue({

@@ -7,6 +7,7 @@ Vue.use(Vuex)
 //创建VueX对象
 const store = new Vuex.Store({
     state:{
+	   hasinit:false,
        UserInfo:{},
 	   ButtonPermission:{},
 	   PagePermission:{}
@@ -17,6 +18,7 @@ const store = new Vuex.Store({
 		},
 		setPagePermission(state,data){
 			state.PagePermission = data;
+			state.hasinit = true;
 		}
 	}
 })

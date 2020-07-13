@@ -14,6 +14,10 @@ export default new VueRouter({
 			redirect: '/login'
 		},
 		{
+			path: '/notFound',
+			component: resolve => require(["~/pages/404"], resolve),
+		},
+		{
 			path: '/login',
 			component: resolve => require(["~/pages/login"], resolve),
 		},
@@ -26,19 +30,26 @@ export default new VueRouter({
 			}, {
 				path: "SysUser",
 				name:"SysUser",
+				meta:{validate:true,menuname:"用户管理"},
 				component: resolve => require(["~/pages/SysUser/list"], resolve),
 			}, {
 				path: "SysRole",
 				name:"SysRole",
+				meta:{validate:true,menuname:"角色管理"},
 				component: resolve => require(["~/pages/SysRole/list"], resolve),
 			}, {
 				path: "SysResource",
 				name:"SysResource",
+				meta:{validate:true,menuname:"资源管理"},
 				component: resolve => require(["~/pages/SysResource/list"], resolve),
 			}, {
 				path: "welcome",
 				name:"welcome",
 				component: resolve => require(["~/pages/welcome"], resolve),
+			}, {
+				path: 'noAuth',
+				name:"noAuth",
+				component: resolve => require(["~/pages/noAuth"], resolve),
 			}]
 		}
 	]

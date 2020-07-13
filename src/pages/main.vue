@@ -9,10 +9,9 @@
 			</el-aside>
 			<el-main class="main-main">
 				<el-breadcrumb separator-class="el-icon-arrow-right" class="main-breadcrumb">
-				  <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-				  <el-breadcrumb-item>活动管理</el-breadcrumb-item>
-				  <el-breadcrumb-item>活动列表</el-breadcrumb-item>
-				  <el-breadcrumb-item>活动详情</el-breadcrumb-item>
+				  <el-breadcrumb-item :to="{ path: '/main' }">首页</el-breadcrumb-item>
+				  <el-breadcrumb-item>{{$route.meta.menuname}}</el-breadcrumb-item>
+				  
 				</el-breadcrumb>
 				
 				<router-view></router-view>
@@ -60,6 +59,10 @@
 				return newary;
 			} 
 			this.menutree = filterMenu(result);
+			if(!pagecodes[this.$route.name]&&this.$route.meta.validate){
+				this.$router.push({name:"noAuth"});
+				//this.$route.push({path:"/noAuth"});
+			}
 			this.$store.commit('setButtonPermission',buttoncodes);
 			this.$store.commit('setPagePermission',pagecodes);
 		  },
