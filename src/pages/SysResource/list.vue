@@ -1,23 +1,29 @@
 <template>
-	<el-tree :data="treelist" :props="defaultProps" node-key="id" default-expand-all @node-drag-start="handleDragStart"
-	 @node-drag-enter="handleDragEnter" @node-drag-leave="handleDragLeave" @node-drag-over="handleDragOver" @node-drag-end="handleDragEnd"
-	 @node-drop="handleDrop" draggable :allow-drop="allowDrop" :allow-drag="allowDrag">
-		<div class="custom-tree-node" slot-scope="{ node, data }">
-			<i :class="{'el-icon-folder':data.type===0,'el-icon-tickets':data.type==1,'el-icon-mouse':data.type==2}">{{data.resourceName}}</i>
-			<span>
-				<el-button type="text" size="mini" @click="() => append(data)">
-					Append
-				</el-button>
-				<el-button type="text" size="mini" @click="() => remove(node, data)">
-					Delete
-				</el-button>
-			</span>
-		</div>
-	</el-tree>
-	<!-- el-icon-tickets
-el-icon-document
-el-icon-video-play
-el-icon-mouse -->
+	<el-row>
+		<el-col :span="12">
+			<el-tree :data="treelist" :props="defaultProps" node-key="id" default-expand-all @node-drag-start="handleDragStart"
+			 @node-drag-enter="handleDragEnter" @node-drag-leave="handleDragLeave" @node-drag-over="handleDragOver" @node-drag-end="handleDragEnd"
+			 @node-drop="handleDrop" draggable :allow-drop="allowDrop" :allow-drag="allowDrag">
+				<div class="custom-tree-node" slot-scope="{ node, data }">
+					<i :class="data.iconClass||iconClass[data.type]">{{data.resourceName}}</i>
+					<span>
+						<el-button type="text" size="mini" @click="() => append(data)">
+							添加
+						</el-button>
+						<el-button type="text" size="mini" @click="() => remove(node, data)">
+							删除
+						</el-button>
+						<el-button type="text" size="mini" @click="() => remove(node, data)">
+							修改
+						</el-button>
+						<el-button type="text" size="mini" @click="() => remove(node, data)">
+							支撑接口
+						</el-button>
+					</span>
+				</div>
+			</el-tree>
+		</el-col>
+	</el-row>
 </template>
 
 <script>
@@ -31,7 +37,8 @@ el-icon-mouse -->
 				defaultProps: {
 					children: 'children',
 					label: 'resourceName'
-				}
+				},
+				iconClass:['el-icon-folder','el-icon-tickets','el-icon-mouse']
 			};
 		},
 		created() {
