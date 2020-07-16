@@ -2,7 +2,7 @@
 	<div>
 		<el-row>
 			<el-col :span="12">
-				<el-tree :data="treelist" :props="defaultProps" node-key="id" default-expand-all :allow-drag="allowDrag" :allow-drop="allowDrop"  @node-drop="handleDrop" draggable >
+				<el-tree :data="treelist" :props="defaultProps" node-key="id" default-expand-all :expand-on-click-node="false" :allow-drag="allowDrag" :allow-drop="allowDrop"  @node-drop="handleDrop" draggable >
 					<div class="custom-tree-node" slot-scope="{ node, data }">
 						<i :class="data.iconClass||iconClass[data.type]">{{data.resourceName}}</i>
 						<span>
@@ -15,7 +15,7 @@
 							<el-button type="text" size="mini" @click="handleEdit(data)">
 								修改
 							</el-button>
-							<el-button type="text" size="mini" @click="support(data)">
+							<el-button type="text" size="mini" @click.native.prevent="support(data)">
 								支撑接口
 							</el-button>
 						</span>
@@ -47,6 +47,18 @@
 				<el-button type="primary" @click="edit" v-if="editid!=null">修 改</el-button>
 			</div>
 		</el-dialog>
+		<el-dialog title="设置支撑接口" :visible.sync="dialogSetVisible" width="800px" @close="closeSet" :close-on-click-modal="false">
+			<el-form :model="setForm" ref="setForm" label-width="100px">
+				<el-form-item>
+					<el-transfer filterable :filter-method="filterMethod" filter-placeholder="" 
+					v-model="setForm.apiids" :data="apilist" :titles="['待选接口', '已选接口']"></el-transfer>
+				</el-form-item>
+			</el-form>
+			<div slot="footer" class="dialog-footer">
+				<el-button @click="dialogSetVisible = false">取 消</el-button>
+				<el-button type="primary" @click="addSet">提 交</el-button>
+			</div>
+		</el-dialog>
 	</div>
 </template>
 
@@ -57,7 +69,10 @@
 		SysResourceCut,
 		SysResourceAdd,
 		SysResourceEdit,
-		SysResourceTreeDrag
+		SysResourceTreeDrag,
+		getSysApiPagelist,
+		getSysResourceApis,
+		setSysResourceApis
 	} from '~/request/api.js';
 	export default {
 		data() {
@@ -110,11 +125,17 @@
 						trigger: 'blur'
 					}]
 				},
-				editid: null
+				editid: null,
+				dialogSetVisible:false,
+				setForm:{
+					apiids:[]
+				},
+				apilist:[]
 			};
 		},
 		created() {
 			this.getTreelist();
+			this.getApiList();
 		},
 		methods: {
 			async getTreelist() {
@@ -125,6 +146,19 @@
 					children: result,
 					type: 0
 				}];
+			},
+			async getApiList() {
+				let result = await getSysApiPagelist({
+					pageNum: 1,
+					pageSize: 0
+				});
+				this.apilist = [];
+				for (let i = 0; i < result.list.length; i++) {
+					this.apilist.push({
+						key: result.list[i].id,
+						label: result.list[i].apiPath
+					});
+				}
 			},
 			handleAdd(data) {
 				this.dialogFormVisible = true;
@@ -178,13 +212,6 @@
 					});
 				});
 			},
-			support(data) {
-
-			},
-			closed() {
-				this.$refs["postForm"].resetFields();
-				this.editid = null;
-			},
 			allowDrag(node) {
 				if(node.data.id===0){
 					return false;
@@ -214,6 +241,31 @@
 				},()=>{
 					this.getTreelist();
 				});
+			},
+			async support(data) {
+				this.editid = data.id;
+				this.dialogSetVisible = true;
+				let result = await getSysResourceApis({id:data.id});
+				this.setForm.apiids = result;
+			},
+			async addSet() {
+				let result = await setSysResourceApis({
+					id:this.editid,
+					apiids:this.setForm.apiids.join(",")
+				});
+				this.dialogSetVisible = false;
+			},
+			closed() {
+				this.$refs["postForm"].resetFields();
+				this.editid = null;
+			},
+			closeSet() {
+				this.$refs["setForm"].resetFields();
+				this.editid = null;
+				this.setForm.apiids = [];
+			},
+			filterMethod(query, item) {
+				return item.label.indexOf(query) > -1;
 			}
 		}
 	};
