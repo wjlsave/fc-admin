@@ -43,6 +43,11 @@ export default new VueRouter({
 				meta:{validate:true,menuname:"资源管理"},
 				component: resolve => require(["~/pages/SysResource/list"], resolve),
 			}, {
+				path: "SysApi",
+				name:"SysApi",
+				meta:{validate:true,menuname:"接口管理"},
+				component: resolve => require(["~/pages/SysApi/list"], resolve),
+			}, {
 				path: "welcome",
 				name:"welcome",
 				component: resolve => require(["~/pages/welcome"], resolve),

@@ -35,7 +35,7 @@
 		 :total="total">
 		</el-pagination>
 
-		<el-dialog title="添加角色" :visible.sync="dialogFormVisible" width="800px" @closed="closed" :close-on-click-modal="false">
+		<el-dialog :title="editid?'修改角色':'添加角色'" :visible.sync="dialogFormVisible" width="800px" @closed="closed" :close-on-click-modal="false">
 			<el-form :model="postForm" ref="postForm" :rules="rules" label-width="100px">
 				<el-form-item label="角色名称" prop="roleName">
 					<el-input v-model="postForm.roleName" autocomplete="off"></el-input>
@@ -46,7 +46,7 @@
 				<el-form-item label="资源权限">
 					<el-tree :data="resourcelist" ref="resourceTree" :props="defaultProps"  node-key="id" :default-checked-keys="postForm.resourceids" show-checkbox default-expand-all>
 						<div slot-scope="{ node, data }">
-							<i :class="{'el-icon-folder':data.type===0,'el-icon-tickets':data.type==1,'el-icon-mouse':data.type==2}">{{data.resourceName}}</i>
+							<i :class="data.iconClass||iconClass[data.type]">{{data.resourceName}}</i>
 						</div>
 					</el-tree>
 				</el-form-item>
@@ -87,6 +87,7 @@
 					resourceids: []
 				},
 				resourcelist: [],
+				iconClass: ['el-icon-folder', 'el-icon-tickets', 'el-icon-mouse'],
 				defaultProps: {
 					children: 'children',
 					label: 'resourceName'

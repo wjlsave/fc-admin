@@ -53,7 +53,7 @@
 		 :total="total">
 		</el-pagination>
 
-		<el-dialog title="添加用户" :visible.sync="dialogFormVisible" width="800px" @closed="closed" :close-on-click-modal="false">
+		<el-dialog :title="editid?'修改用户':'添加用户'" :visible.sync="dialogFormVisible" width="800px" @close="close" :close-on-click-modal="false">
 			<el-form :model="postForm" ref="postForm" :rules="rules" label-width="100px">
 				<el-form-item label="账户名称" prop="account">
 					<el-input v-model="postForm.account" autocomplete="off"></el-input>
@@ -71,7 +71,7 @@
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
-				<el-button @click="cancel">取 消</el-button>
+				<el-button @click="dialogFormVisible = false">取 消</el-button>
 				<el-button type="primary" @click="add" v-if="editid==null">提 交</el-button>
 				<el-button type="primary" @click="edit" v-if="editid!=null">修 改</el-button>
 				<el-button type="danger" @click="resetpassword" v-if="editid!=null">重置密码</el-button>
@@ -178,9 +178,6 @@
 				this.pageNum = val;
 				this.getPageInfo();
 			},
-			cancel() {
-				this.dialogFormVisible = false;
-			},
 			async add() {
 				this.$refs["postForm"].validate(async (valid) => {
 					if (valid) {
@@ -242,10 +239,10 @@
 				          });
 						});
 			},
-			closed() {
+			close() {
 				this.$refs["postForm"].resetFields();
 				this.editid = null;
-				this.postForm.rolelids = [];
+				this.postForm.roleids = [];
 				this.postForm.state = "1";
 			}
 		}
