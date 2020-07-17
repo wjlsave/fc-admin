@@ -6,7 +6,7 @@
 			</el-form-item>
 			<el-form-item>
 				<el-button type="primary" @click="search">查询</el-button>
-				<el-button type="primary" icon="el-icon-edit" @click="dialogFormVisible = true">添加</el-button>
+				<el-button type="primary" icon="el-icon-edit" @click="dialogFormVisible = true" v-if="$store.state.ButtonPermission.addSysRole">添加</el-button>
 			</el-form-item>
 		</el-form>
 		<el-table :data="tableData" height="calc(100% - 119px)" border style="width: 100%">
@@ -14,17 +14,24 @@
 			</el-table-column>
 			<el-table-column prop="roleDescription" label="角色描述">
 			</el-table-column>
-			<el-table-column prop="createTime" label="创建时间" align="center">
+			<el-table-column prop="createtime" label="创建时间" align="center">
 			</el-table-column>
 			<el-table-column label="操作" width="200" fixed="right" align="center">
 			      <template slot-scope="scope">
+					<el-button
+					  size="mini"
+					  type="primary"
+					   v-if="!$store.state.ButtonPermission.editSysRole&&$store.state.ButtonPermission.seeSysRole"
+					  @click="handleEdit(scope.$index, scope.row)">查看</el-button>
 			        <el-button
 			          size="mini"
 					  type="warning"
-			          @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+					  v-if="$store.state.ButtonPermission.editSysRole"
+			          @click="handleEdit(scope.$index, scope.row)">修改</el-button>
 			        <el-button
 			          size="mini"
 			          type="danger"
+					  v-if="$store.state.ButtonPermission.cutSysRole"
 			          @click="cut(scope.$index, scope.row)">删除</el-button>
 			      </template>
 			    </el-table-column>
@@ -35,8 +42,8 @@
 		 :total="total">
 		</el-pagination>
 
-		<el-dialog :title="editid?'修改角色':'添加角色'" :visible.sync="dialogFormVisible" width="800px" @closed="closed" :close-on-click-modal="false">
-			<el-form :model="postForm" ref="postForm" :rules="rules" label-width="100px">
+		<el-dialog :title="editid?($store.state.ButtonPermission.editSysRole?'修改角色':'查看角色'):'添加角色'" :visible.sync="dialogFormVisible" width="800px" @closed="closed" :close-on-click-modal="false">
+			<el-form :model="postForm" ref="postForm" :rules="rules" label-width="100px" :disabled="editid&&!$store.state.ButtonPermission.editSysRole">
 				<el-form-item label="角色名称" prop="roleName">
 					<el-input v-model="postForm.roleName" autocomplete="off"></el-input>
 				</el-form-item>
@@ -53,8 +60,8 @@
 			</el-form>
 			<div slot="footer" class="dialog-footer">
 				<el-button @click="cancel">取 消</el-button>
-				<el-button type="primary" @click="add" v-if="editid==null">提 交</el-button>
-				<el-button type="primary" @click="edit" v-if="editid!=null">修 改</el-button>
+				<el-button type="primary" @click="add" v-if="!editid&&$store.state.ButtonPermission.addSysRole">提 交</el-button>
+				<el-button type="primary" @click="edit" v-if="editid&&$store.state.ButtonPermission.editSysRole">修 改</el-button>
 			</div>
 		</el-dialog>
 	</div>
@@ -99,13 +106,13 @@
 							trigger: 'blur'
 						},
 						{
-							range:{min:1,max:50},
+							range:{max:50},
 							message: '不超过50个字符',
 							trigger: 'blur'
 						}
 					],
 					roleDescription: [{
-							range:{min:1,max:1000},
+							range:{max:1000},
 							message: '不超过1000个字符',
 							trigger: 'blur'
 						}
@@ -189,8 +196,8 @@
 			},
 			async handleEdit(index,row){
 				this.editid = row.id;
-				let result = await SysRoleDetail({id:row.id});
 				this.dialogFormVisible = true;
+				let result = await SysRoleDetail({id:row.id});
 				let resourceids = result.resourceids;
 				delete result.resourceids;
 				this.postForm = this.$util.OverrideObject(this.postForm,result);

@@ -15,13 +15,18 @@
 			<el-table-column prop="apiDescribe" label="接口说明">
 			</el-table-column>
 			
-			<el-table-column label="操作" width="200" align="center" v-if="$store.state.ButtonPermission.editSysApi||$store.state.ButtonPermission.cutSysApi">
+			<el-table-column label="操作" width="200" align="center">
 			      <template slot-scope="scope">
+					<el-button
+					  size="mini"
+					  type="primary"
+					   v-if="!$store.state.ButtonPermission.editSysApi&&$store.state.ButtonPermission.seeSysApi"
+					  @click="handleEdit(scope.$index, scope.row)">查看</el-button>  
 			        <el-button
 			          size="mini"
 					  type="warning"
 					   v-if="$store.state.ButtonPermission.editSysApi"
-			          @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+			          @click="handleEdit(scope.$index, scope.row)">修改</el-button>
 			        <el-button
 			          size="mini"
 			          type="danger"
@@ -36,8 +41,8 @@
 		 :total="total">
 		</el-pagination>
 
-		<el-dialog :title="editid?'修改接口':'添加接口'" :visible.sync="dialogFormVisible" width="800px" @close="close" :close-on-click-modal="false">
-			<el-form :model="postForm" ref="postForm" :rules="rules" label-width="100px">
+		<el-dialog :title="editid?($store.state.ButtonPermission.editSysApi?'修改接口':'查看接口'):'添加接口'" :visible.sync="dialogFormVisible" width="800px" @close="close" :close-on-click-modal="false">
+			<el-form :model="postForm" ref="postForm" :rules="rules" label-width="100px" :disabled="editid&&!$store.state.ButtonPermission.editSysApi">
 				<el-form-item label="接口路径" prop="apiPath">
 					<el-input v-model="postForm.apiPath" autocomplete="off"></el-input>
 				</el-form-item>
@@ -47,8 +52,8 @@
 			</el-form>
 			<div slot="footer" class="dialog-footer">
 				<el-button @click="dialogFormVisible = false">取 消</el-button>
-				<el-button type="primary" @click="add" v-if="editid==null">提 交</el-button>
-				<el-button type="primary" @click="edit" v-if="editid!=null">修 改</el-button>
+				<el-button type="primary" @click="add" v-if="!editid&&$store.state.ButtonPermission.addSysApi">提 交</el-button>
+				<el-button type="primary" @click="edit" v-if="editid&&$store.state.ButtonPermission.editSysApi">修 改</el-button>
 			</div>
 		</el-dialog>
 	</div>
@@ -138,8 +143,8 @@
 			},
 			async handleEdit(index,row){
 				this.editid = row.id;
-				let result = await SysApiDetail({id:row.id});
 				this.dialogFormVisible = true;
+				let result = await SysApiDetail({id:row.id});
 				this.postForm = this.$util.OverrideObject(this.postForm,result);
 			},
 			async edit() {
@@ -178,9 +183,5 @@
 <style>
 	.pagelist-container {
 		height: calc(100% - 29px)
-	}
-
-	.pagelist-form {
-		text-align: left;
 	}
 </style>

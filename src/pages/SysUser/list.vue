@@ -32,13 +32,18 @@
 			</el-table-column>
 			<el-table-column prop="lastLoginTime" label="最后登录时间" align="center">
 			</el-table-column>
-			<el-table-column label="操作" width="200" fixed="right" align="center" v-if="$store.state.ButtonPermission.editSysUser||$store.state.ButtonPermission.cutSysUser">
+			<el-table-column label="操作" width="300" fixed="right" align="center">
 			      <template slot-scope="scope">
+					<el-button
+					  size="mini"
+					  type="primary"
+					   v-if="!$store.state.ButtonPermission.editSysUser&&$store.state.ButtonPermission.seeSysUser"
+					  @click="handleEdit(scope.$index, scope.row)">查看</el-button>
 			        <el-button
 			          size="mini"
 					  type="warning"
 					   v-if="$store.state.ButtonPermission.editSysUser"
-			          @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+			          @click="handleEdit(scope.$index, scope.row)">修改</el-button>
 			        <el-button
 			          size="mini"
 			          type="danger"
@@ -53,8 +58,8 @@
 		 :total="total">
 		</el-pagination>
 
-		<el-dialog :title="editid?'修改用户':'添加用户'" :visible.sync="dialogFormVisible" width="800px" @close="close" :close-on-click-modal="false">
-			<el-form :model="postForm" ref="postForm" :rules="rules" label-width="100px">
+		<el-dialog :title="editid?($store.state.ButtonPermission.editSysUser?'修改用户':'查看用户'):'添加用户'" :visible.sync="dialogFormVisible" width="800px" @close="close" :close-on-click-modal="false">
+			<el-form :model="postForm" ref="postForm" :rules="rules" label-width="100px" :disabled="editid&&!$store.state.ButtonPermission.editSysUser">
 				<el-form-item label="账户名称" prop="account">
 					<el-input v-model="postForm.account" autocomplete="off"></el-input>
 				</el-form-item>
@@ -67,14 +72,14 @@
 					</el-switch>
 				</el-form-item>
 				<el-form-item label="角色选择">
-					<el-transfer v-model="postForm.roleids" :data="rolelist" :titles="['待选角色', '已选角色']"></el-transfer>
+					<el-transfer v-model="postForm.roleids" :data="rolelist" :titles="['待选角色','已选角色']"></el-transfer>
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
 				<el-button @click="dialogFormVisible = false">取 消</el-button>
-				<el-button type="primary" @click="add" v-if="editid==null">提 交</el-button>
-				<el-button type="primary" @click="edit" v-if="editid!=null">修 改</el-button>
-				<el-button type="danger" @click="resetpassword" v-if="editid!=null">重置密码</el-button>
+				<el-button type="primary" @click="add" v-if="!editid&&$store.state.ButtonPermission.addSysUser">提 交</el-button>
+				<el-button type="primary" @click="edit" v-if="editid&&$store.state.ButtonPermission.editSysUser">修 改</el-button>
+				<el-button type="danger" @click="resetpassword" v-if="editid&&$store.state.ButtonPermission.resetPassword">重置密码</el-button>
 			</div>
 		</el-dialog>
 	</div>
@@ -98,8 +103,8 @@
 				pageSize: 20,
 				total: 0,
 				paramForm: {
-					account: '',
-					userName: '',
+					account: null,
+					userName: null,
 					state: null
 				},
 				tableData: [],
@@ -218,8 +223,8 @@
 			},
 			async handleEdit(index,row){
 				this.editid = row.id;
-				let result = await SysUserDetail({id:row.id});
 				this.dialogFormVisible = true;
+				let result = await SysUserDetail({id:row.id});
 				this.postForm = this.$util.OverrideObject(this.postForm,result);
 				this.postForm.roleids = result.roleids;
 				this.postForm.state+="";
@@ -256,5 +261,9 @@
 
 	.pagelist-form {
 		text-align: left;
+	}
+	
+	.el-transfer-panel__list{
+		line-height: normal;
 	}
 </style>

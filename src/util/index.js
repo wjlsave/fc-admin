@@ -2,7 +2,7 @@ export default {
 	filterParams : obj =>{
 		let params = Object.assign({},obj);
 		for (let key in params) {
-			if (params[key] == null || params[key] == "") {
+			if (params[key] == null) {
 				delete params[key];
 			}
 		}

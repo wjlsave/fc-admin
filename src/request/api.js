@@ -38,7 +38,7 @@ export const SysResourceEdit = (p) => http.post('SysResource/edit',p,{successMes
 
 export const SysResourceTreeDrag = (p) => http.post('SysResource/treedrag',p,{successMessage:"修改位置成功"});
 
-export const getSysResourceOfUser = (p,errorMethod) => http.get('SysResource/getuserresource',p,{},errorMethod);
+export const getSysResourceOfUser = () => http.get('SysResource/getuserresource');
 
 export const getSysResourceApis = (p) => http.get('SysResource/getresourceapis',p);
 

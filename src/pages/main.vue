@@ -40,7 +40,7 @@
 		},
 	    methods: {
 		  async getResource(){
-		  	let result = await getSysResourceOfUser({userid:6});
+		  	let result = await getSysResourceOfUser();
 			let buttoncodes = {};
 			let pagecodes = {};
 			let filterMenu = (ary) => {

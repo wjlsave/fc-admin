@@ -101,10 +101,12 @@ instance.interceptors.response.use(
 	}
 )
 
-http.post = function(url, data, options = {
-	isShowLoading: true,
-	successMessage: "操作成功"
-}, errorMethod) {
+http.post = function(url, data, options,errorMethod) {
+	let defalutOptions = {
+		successMessage:"操作成功",
+		isShowLoading:true
+	}
+	options = Object.assign(defalutOptions,options);
 	let loadinginstance;
 	if (options.isShowLoading) {
 		loadinginstance = Loading.service({
@@ -149,11 +151,13 @@ http.post = function(url, data, options = {
 	})
 }
 
-http.get = function(url, data, options = {
-	isShowLoading: true
-}) {
+http.get = function(url, data, options) {
+	let defalutOptions = {
+		isShowLoading:true
+	}
+	options = Object.assign(defalutOptions,options);
 	let loadinginstance;
-	if (options.isShowLoading !== false) {
+	if (options.isShowLoading) {
 		loadinginstance = Loading.service({
 			fullscreen: true,
 			background: 'rgba(0, 0, 0, 0.7)',

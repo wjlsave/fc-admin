@@ -6,16 +6,19 @@
 					<div class="custom-tree-node" slot-scope="{ node, data }">
 						<i :class="data.iconClass||iconClass[data.type]">{{data.resourceName}}</i>
 						<span>
-							<el-button type="text" size="mini" @click="handleAdd(data)" v-if="data.type!=2">
+							<el-button type="text" size="mini" @click="handleAdd(data)" v-if="data.type!=2&&$store.state.ButtonPermission.addSysResource">
 								添加
 							</el-button>
-							<el-button type="text" class="Danger" size="mini" @click="cut(data)">
-								删除
+							<el-button type="text" style="color: #E6A23C;" size="mini" @click="handleEdit(data)" v-if="data.id!==0&&!$store.state.ButtonPermission.editSysResource&&$store.state.ButtonPermission.seeSysResource">
+								查看
 							</el-button>
-							<el-button type="text" size="mini" @click="handleEdit(data)">
+							<el-button type="text" style="color: #E6A23C;" size="mini" @click="handleEdit(data)" v-if="data.id!==0&&$store.state.ButtonPermission.editSysResource">
 								修改
 							</el-button>
-							<el-button type="text" size="mini" @click.native.prevent="support(data)">
+							<el-button type="text" style="color: #F56C6C;" class="Danger" size="mini" @click="cut(data)" v-if="data.id!==0&&$store.state.ButtonPermission.cutSysResource">
+								删除
+							</el-button>
+							<el-button type="text" style="color: #F56C6C;" size="mini" @click.native.prevent="support(data)" v-if="data.id!==0&&$store.state.ButtonPermission.supportApi">
 								支撑接口
 							</el-button>
 						</span>
@@ -24,9 +27,9 @@
 			</el-col>
 		</el-row>
 
-		<el-dialog :title="editid?'修改资源':'添加资源'" :visible.sync="dialogFormVisible" width="800px" @closed="closed"
+		<el-dialog :title="editid?($store.state.ButtonPermission.editSysResource?'修改资源':'查看资源'):'添加资源'" :visible.sync="dialogFormVisible" width="800px" @closed="closed"
 		 :close-on-click-modal="false">
-			<el-form :model="postForm" ref="postForm" :rules="rules" label-width="100px">
+			<el-form :model="postForm" ref="postForm" :rules="rules" label-width="100px" :disabled="editid&&!$store.state.ButtonPermission.editSysResource">
 				<el-form-item label="资源名称" prop="resourceName">
 					<el-input v-model="postForm.resourceName" autocomplete="off"></el-input>
 				</el-form-item>
@@ -43,12 +46,12 @@
 			</el-form>
 			<div slot="footer" class="dialog-footer">
 				<el-button @click="dialogFormVisible = false">取 消</el-button>
-				<el-button type="primary" @click="add" v-if="editid==null">提 交</el-button>
-				<el-button type="primary" @click="edit" v-if="editid!=null">修 改</el-button>
+				<el-button type="primary" @click="add"  v-if="!editid&&$store.state.ButtonPermission.addSysResource">提 交</el-button>
+				<el-button type="primary" @click="edit"  v-if="editid&&$store.state.ButtonPermission.editSysResource">修 改</el-button>
 			</div>
 		</el-dialog>
 		<el-dialog title="设置支撑接口" :visible.sync="dialogSetVisible" width="800px" @close="closeSet" :close-on-click-modal="false">
-			<el-form :model="setForm" ref="setForm" label-width="100px">
+			<el-form :model="setForm" ref="setForm" label-width="0">
 				<el-form-item>
 					<el-transfer filterable :filter-method="filterMethod" filter-placeholder="" 
 					v-model="setForm.apiids" :data="apilist" :titles="['待选接口', '已选接口']"></el-transfer>
@@ -94,27 +97,32 @@
 				rules: {
 					resourceName: [{
 							required: true,
+							message: '请输入资源名称',
 							trigger: 'blur'
 						},
 						{
 							range: {
 								max: 50
 							},
+							message: '不超过50个字符',
 							trigger: 'blur'
 						}
 					],
 					type: [{
 						required: true,
+						message: '请选择资源类别',
 						trigger: 'blur'
 					}],
 					path: [{
 							required: true,
+							message: '请输入资源路径',
 							trigger: 'blur'
 						},
 						{
 							range: {
 								max: 200
 							},
+							message: '不超过200个字符',
 							trigger: 'blur'
 						}
 					],
@@ -122,6 +130,7 @@
 						range: {
 							max: 100
 						},
+						message: '不超过100个字符',
 						trigger: 'blur'
 					}]
 				},
@@ -176,10 +185,10 @@
 			},
 			async handleEdit(data) {
 				this.editid = data.id;
+				this.dialogFormVisible = true;
 				let result = await SysResourceDetail({
 					id: data.id
 				});
-				this.dialogFormVisible = true;
 				this.postForm = this.$util.OverrideObject(this.postForm, result);
 				this.postForm.type+="";
 			},
@@ -280,4 +289,10 @@
 		font-size: 14px;
 		padding-right: 8px;
 	}
+	
+	.el-transfer-panel{
+		line-height: normal;
+		width: 325px;
+	}
+	
 </style>
