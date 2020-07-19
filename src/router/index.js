@@ -55,6 +55,10 @@ export default new VueRouter({
 				path: 'noAuth',
 				name:"noAuth",
 				component: resolve => require(["~/pages/noAuth"], resolve),
+			}, {
+				path: "Test",
+				name:"Test",
+				component: resolve => require(["~/pages/Test"], resolve),
 			}]
 		}
 	]

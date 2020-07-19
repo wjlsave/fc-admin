@@ -180,7 +180,7 @@
 	}
 </script>
 
-<style>
+<style scoped="scoped">
 	.pagelist-container {
 		height: calc(100% - 29px)
 	}

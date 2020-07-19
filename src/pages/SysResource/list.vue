@@ -280,7 +280,7 @@
 	};
 </script>
 
-<style>
+<style scoped="scoped">
 	.custom-tree-node {
 		flex: 1;
 		display: flex;

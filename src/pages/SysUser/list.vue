@@ -1,6 +1,6 @@
 <template>
 	<div class="pagelist-container">
-		<el-form :inline="true" size="medium" :model="paramForm" class="pagelist-form">
+		<el-form :inline="true" size="medium" :model="paramForm">
 			<el-form-item>
 				<el-input v-model="paramForm.account" placeholder="账号"></el-input>
 			</el-form-item>
@@ -254,13 +254,9 @@
 	}
 </script>
 
-<style>
+<style scoped="scoped">
 	.pagelist-container {
 		height: calc(100% - 29px)
-	}
-
-	.pagelist-form {
-		text-align: left;
 	}
 	
 	.el-transfer-panel__list{

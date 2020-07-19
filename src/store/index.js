@@ -13,6 +13,9 @@ const store = new Vuex.Store({
 	   PagePermission:{}
     },
 	mutations:{
+		setUserInfo(state,data){
+			state.UserInfo = data;
+		},
 		setButtonPermission(state,data){
 			state.ButtonPermission = data;
 		},
