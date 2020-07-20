@@ -4,7 +4,7 @@
 			<el-form-item v-for="(inputConfig,index) in paramFormConfig" :key="index"  
 			:label="inputConfig.label" :prop="inputConfig.bindingCode">
 				<component :is="inputConfig.component" v-model="paramForm[inputConfig.bindingCode]" 
-				:placeholder="inputConfig.placeholder"></component>
+				:placeholder="inputConfig.placeholder" :config="inputConfig.config"></component>
 			</el-form-item>
 			<el-form-item>
 				<el-button type="primary" @click="search">查询</el-button>
@@ -12,9 +12,13 @@
 			</el-form-item>
 		</el-form>
 		<el-table :data="tableData" height="calc(100% - 119px)" border>
-			<el-table-column v-for="(columnConfig,index) in tableConfig" :key="index" 
-			:prop="columnConfig.bindingCode" :label="columnConfig.label" :align="columnConfig.align" 
-			:width="columnConfig.width" :min-width="columnConfig.minWidth">
+			<el-table-column v-for="(columnConfig,index) in tableConfig" :key="index"
+				:prop="columnConfig.bindingCode" :label="columnConfig.label" :align="columnConfig.align" 
+				:width="columnConfig.width" :min-width="columnConfig.minWidth">
+				<div  slot-scope="scope">
+					<div v-if="!!columnConfig.component"><component :is="columnConfig.component" :value="scope.row[columnConfig.bindingCode]"></component></div>
+					<div v-else>{{scope.row[columnConfig.bindingCode]}}</div>
+				</div>
 			</el-table-column>
 			<el-table-column label="操作" width="300" fixed="right" align="center">
 			      <template slot-scope="scope">
@@ -46,7 +50,7 @@
 				<el-form-item v-for="(inputConfig,index) in postFormConfig" :key="index"
 				:label="inputConfig.label" :prop="inputConfig.bindingCode">
 					<component :is="inputConfig.component" v-model="postForm[inputConfig.bindingCode]" 
-					:placeholder="inputConfig.placeholder" autocomplete="off"></component>
+					:placeholder="inputConfig.placeholder" :config="inputConfig.config"></component>
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
@@ -60,6 +64,7 @@
 
 <script>
 	import http from '~/request/httpConfig'
+	import components from './mycomponent'
 	export default {
 		props: {
 			modelInfo:{
@@ -107,6 +112,7 @@
 				editid:null
 			}
 		},
+		components,
 		created(){
 			this.getPageInfo()
 		},
@@ -178,7 +184,9 @@
 				});
 			},
 			close() {
-				this.$refs["postForm"].resetFields();
+				this.postFormConfig.forEach(item=>{
+					this.postForm[item.bindingCode] = null;
+				});
 				this.editid = null;
 			}
 		}
