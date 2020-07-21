@@ -1,9 +1,10 @@
 <template>
-	<el-transfer v-model="value" :data="setting.datalist" :titles="setting.titles"></el-transfer>
+	<el-checkbox-group v-model="value">
+		<el-checkbox :label="option.value" v-for="(option,index) in setting.options" :key="index" :border='setting.border'>{{option.label}}</el-checkbox>
+	</el-checkbox-group>
 </template>
 
 <script>
-	import http from '~/request/httpConfig'
 	export default {
 		props: {
 			pValue: [Number, String, Array],
@@ -13,16 +14,11 @@
 			prop: 'pValue',
 			event: 'change'
 		},
-		name: 'fc-switch',
+		name: 'fc-checkbox',
 		data() {
 			let def = {
-				titles: ['候选区', '已选区'],
-				datalist: [],
-				ajaxUrl: null,
-				ajaxParams: {},
-				ajaxParseData: (data) => {
-					return data
-				}
+				options: [],
+				border: true
 			}
 			let setting = Object.assign(def, this.config);
 			let value = this.parseValue(this.pValue);
@@ -32,18 +28,11 @@
 			}
 		},
 		created() {
-			if (this.setting.ajaxUrl != null) {
-				this.getDatalist();
-			}
 			if (this.pValue !== this.value) {
 				this.$emit('change', this.formatValue(this.value));
 			}
 		},
 		methods: {
-			async getDatalist() {
-				let result = await http.get(this.setting.ajaxUrl, this.setting.ajaxParams);
-				this.setting.datalist = this.setting.ajaxParseData(result);
-			},
 			parseValue(pValue) {
 				let value = [];
 				if (!pValue) {
@@ -74,5 +63,4 @@
 </script>
 
 <style>
-
 </style>

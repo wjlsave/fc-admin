@@ -54,6 +54,7 @@
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
+				{{postForm}}
 				<el-button @click="dialogFormVisible = false">取 消</el-button>
 				<el-button type="primary" @click="add" v-if="!editid&&$store.state.ButtonPermission['add'+modelInfo.code]">提 交</el-button>
 				<el-button type="primary" @click="edit" v-if="editid&&$store.state.ButtonPermission['edit'+modelInfo.code]">修 改</el-button>

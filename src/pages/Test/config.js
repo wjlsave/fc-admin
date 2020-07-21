@@ -38,18 +38,18 @@ export default {
 			label: "姓名",
 			width: 180,
 			align: "left"
-		},{
+		}, {
 			bindingCode: "state",
 			label: "状态",
 			width: 120,
 			align: "center",
 			component: "fc-tag"
-		},{
+		}, {
 			bindingCode: "createTime",
 			label: "创建时间",
 			width: 180,
 			align: "center"
-		},{
+		}, {
 			bindingCode: "lastLoginTime",
 			label: "最后登录时间",
 			minWidth: 180,
@@ -63,7 +63,7 @@ export default {
 		},
 		{
 			label: "用户姓名",
-			component: "el-input",
+			component: "fc-textinput",
 			bindingCode: "userName"
 		},
 		{
@@ -72,27 +72,82 @@ export default {
 			bindingCode: "state",
 		},
 		{
+			label: "创建时间",
+			component: "fc-time-select",
+			bindingCode: "createTime3"
+		},
+		{
+			label: "创建时间",
+			component: "fc-time-picker",
+			bindingCode: "createTime2"
+		},
+		{
+			label: "创建时间",
+			component: "fc-date-picker",
+			bindingCode: "createTime"
+		},
+		{
+			component: "fc-checkbox",
+			bindingCode: "state",
+			config: {
+				options: [{
+					label: "启用",
+					value: "1"
+				}, {
+					label: "禁用",
+					value: "0"
+				}]
+			}
+		},
+		{
+			component: "fc-select",
+			bindingCode: "state",
+			config: {
+				options: [{
+					label: "启用",
+					value: "1"
+				}, {
+					label: "禁用",
+					value: "0"
+				}]
+			}
+		},
+		{
+			component: "fc-radio",
+			bindingCode: "radio3",
+			config: {
+				options: [{
+					label: "选项A",
+					value: "1"
+				}, {
+					label: "选项B",
+					value: "2"
+				}, {
+					label: "选项C",
+					value: "3"
+				}]
+			}
+		},
+		{
 			label: "角色选择",
 			component: "fc-transfer",
 			bindingCode: "roleids",
 			config: {
 				titles: ['待选角色', '已选角色'],
-				ajax: {
-					url: "SysRole/pagelist",
-					params: {
-						pageNum: 1,
-						pageSize: 0
-					},
-					parseData: (result) => {
-						let rolelist = [];
-						for (let i = 0; i < result.list.length; i++) {
-							rolelist.push({
-								key: result.list[i].id,
-								label: result.list[i].roleName
-							});
-						}
-						return rolelist;
+				ajaxUrl: "SysRole/pagelist",
+				ajaxParams: {
+					pageNum: 1,
+					pageSize: 0
+				},
+				ajaxParseData: (result) => {
+					let rolelist = [];
+					for (let i = 0; i < result.list.length; i++) {
+						rolelist.push({
+							key: result.list[i].id.toString(),
+							label: result.list[i].roleName
+						});
 					}
+					return rolelist;
 				}
 			}
 		}

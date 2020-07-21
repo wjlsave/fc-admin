@@ -6,10 +6,7 @@
 <script>
 	export default {
 		props: {
-			pValue: {
-				type: Number,
-				default:1
-			}
+			pValue: [Number,String]
 		},
 		model: {
 			prop: 'pValue',
@@ -17,26 +14,32 @@
 		},
 		name: 'fc-switch',
 		data() {
-			let value;
-			if(this.pValue ==null){
-				value = "1";
-			}else{
-				value = this.pValue.toString();
-			}
+			let value = this.parseValue(this.pValue);
 			return {
 				value
 			}
 		},
+		created(){
+			if(this.pValue!==this.value){
+				this.$emit('change', this.formatValue(this.value));
+			}
+		},
+		methods:{
+			parseValue(pValue){
+				if(pValue==null){pValue=1}
+				return typeof pValue == 'number'?pValue.toString():pValue;
+			},
+			formatValue(value){
+				return value;
+			}
+		},
 		watch: {
 			value(val) {
-				this.$emit('change', parseInt(val));
+				this.$emit('change', this.formatValue(val));
 			},
 			pValue(val){
-				if(val ==null){
-					value = "1";
-				}else{
-					this.value = val.toString();
-				}
+				let value = this.parseValue(val);
+				this.value = value;
 			}
 		}
 	}

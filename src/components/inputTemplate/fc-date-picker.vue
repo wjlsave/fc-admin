@@ -1,23 +1,28 @@
 <template>
-	<el-select clearable v-model="value">
-		<el-option :label="option.label" :value="option.value" v-for="(option,index) in setting.options" :key="index"></el-option>
-	</el-select>
+	<el-date-picker
+	      v-model="value"
+	      :type="setting.type"
+	      :placeholder="setting.placeholder"
+		  :value-format="setting.format">
+	    </el-date-picker>
 </template>
 
 <script>
 	export default {
 		props: {
-			pValue: [String, Number],
+			pValue: [Number,String,Date],
 			config:[Object]
 		},
 		model: {
 			prop: 'pValue',
 			event: 'change'
 		},
-		name: 'fc-select',
+		name: 'fc-date-picker',
 		data() {
 			let def = {
-				options: []
+				placeholder: null,
+				type:"datetime",
+				format:"yyyy-MM-dd HH:mm:ss"
 			}
 			let setting = Object.assign(def, this.config);
 			let value = this.parseValue(this.pValue);

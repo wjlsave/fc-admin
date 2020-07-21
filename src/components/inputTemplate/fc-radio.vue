@@ -1,20 +1,20 @@
 <template>
-	<el-select clearable v-model="value">
-		<el-option :label="option.label" :value="option.value" v-for="(option,index) in setting.options" :key="index"></el-option>
-	</el-select>
+	<div>
+		<el-radio v-model="value" :label="option.value"  v-for="(option,index) in setting.options" :key="index">{{option.label}}</el-radio>
+	</div>
 </template>
 
 <script>
 	export default {
 		props: {
-			pValue: [String, Number],
+			pValue: [Number,String],
 			config:[Object]
 		},
 		model: {
 			prop: 'pValue',
 			event: 'change'
 		},
-		name: 'fc-select',
+		name: 'fc-radio',
 		data() {
 			let def = {
 				options: []

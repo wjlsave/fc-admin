@@ -11,7 +11,7 @@
 		</el-header>
 		<el-container class="main-c2">
 			<el-aside class="main-aside" width="210px">
-				<el-menu class="main-menu" :router="true" :default-active="$route.name" @open="handleOpen" @close="handleClose"
+				<el-menu class="main-menu" :router="true" :default-active="$route.name" :default-openeds="opends" @open="handleOpen" @close="handleClose"
 				 background-color="#545c64" text-color="#fff" active-text-color="#ffd04b">
 					<MenuTree :menuData="menutree"></MenuTree>
 				</el-menu>
@@ -39,13 +39,12 @@
 
 	export default {
 		components: {
-			'MenuTree': MenuTree
+			'MenuTree': MenuTree,
 		},
 		data() {
 			return {
 				menutree: [],
-				activeIndex: '1',
-				activeIndex2: '1'
+				opends:[]
 			}
 		},
 		created() {
@@ -65,12 +64,14 @@
 				let result = await getSysResourceOfUser();
 				let buttoncodes = {};
 				let pagecodes = {};
+				let opends =[];
 				let filterMenu = (ary) => {
 					let newary = ary.filter((item) => {
 						if (item.type == 1) {
 							if (item.children != null) {
 								item.children = filterMenu(item.children);
 							}
+							opends.push(item.path);
 							pagecodes[item.path] = true;
 							return true;
 						} else {
@@ -80,6 +81,7 @@
 					});
 					return newary;
 				}
+				this.opends = opends;
 				this.menutree = filterMenu(result.sysResources);
 				if (!pagecodes[this.$route.name] && this.$route.meta.validate) {
 					this.$router.push({
