@@ -3,6 +3,7 @@ export default {
 		name: "用户",
 		code: "SysUser"
 	},
+	module:[false,false,true,true,false],
 	paramFormConfig: [{
 			component: "el-input",
 			bindingCode: "account",

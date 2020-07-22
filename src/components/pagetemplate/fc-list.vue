@@ -1,14 +1,17 @@
 <template>
 	<div class="pagelist-container">
 		<el-form :inline="true" size="medium" v-model="paramForm">
-			<el-form-item v-for="(inputConfig,index) in paramFormConfig" :key="index"  
-			:label="inputConfig.label" :prop="inputConfig.bindingCode">
-				<component :is="inputConfig.component" v-model="paramForm[inputConfig.bindingCode]" 
-				:placeholder="inputConfig.placeholder" :config="inputConfig.config"></component>
-			</el-form-item>
+			<div v-if="module[4]">
+				<el-form-item v-for="(inputConfig,index) in paramFormConfig" :key="index"
+				:label="inputConfig.label" :prop="inputConfig.bindingCode">
+					<component :is="inputConfig.component" v-model="paramForm[inputConfig.bindingCode]" 
+					:placeholder="inputConfig.placeholder" :config="inputConfig.config"></component>
+				</el-form-item>
+			</div>
 			<el-form-item>
-				<el-button type="primary" @click="search">查询</el-button>
-				<el-button type="primary" icon="el-icon-edit" @click="handleAdd" v-if="$store.state.ButtonPermission['add'+modelInfo.code]">添加</el-button>
+				<el-button type="primary" @click="search" v-if="module[4]">查询</el-button>
+				<el-button type="primary" icon="el-icon-edit" @click="handleAdd" v-if="module[0]&&(permissionClose||$store.state.ButtonPermission['add'+modelInfo.code])">添加</el-button>
+				<slot name="paramFormButton"></slot>
 			</el-form-item>
 		</el-form>
 		<el-table :data="tableData" height="calc(100% - 119px)" border>
@@ -25,18 +28,19 @@
 					<el-button
 					  size="mini"
 					  type="primary"
-					   v-if="!$store.state.ButtonPermission['edit'+modelInfo.code]&&$store.state.ButtonPermission['add'+modelInfo.code]"
+					   v-if="module[3]&&(permissionClose||(!$store.state.ButtonPermission['edit'+modelInfo.code]&&$store.state.ButtonPermission['see'+modelInfo.code]))"
 					  @click="handleEdit(scope.$index, scope.row)">查看</el-button>
 			        <el-button
 			          size="mini"
 					  type="warning"
-					   v-if="$store.state.ButtonPermission['edit'+modelInfo.code]"
+					   v-if="module[2]&&(permissionClose||$store.state.ButtonPermission['edit'+modelInfo.code])"
 			          @click="handleEdit(scope.$index, scope.row)">修改</el-button>
 			        <el-button
 			          size="mini"
 			          type="danger"
-					  v-if="$store.state.ButtonPermission['cut'+modelInfo.code]"
+					  v-if="module[1]&&(permissionClose||$store.state.ButtonPermission['cut'+modelInfo.code])"
 			          @click="cut(scope.$index, scope.row)">删除</el-button>
+					<slot name="paramFormButton"></slot>
 			      </template>
 			    </el-table-column>
 		</el-table>
@@ -44,7 +48,7 @@
 		 :page-sizes="[10,20,50,100,1000,10000]" :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper"
 		 :total="total">
 		</el-pagination>
-		<el-dialog :title="(editid?($store.state.ButtonPermission['edit'+modelInfo.code]?'修改':'查看'):'添加')+modelInfo.name" 
+		<el-dialog :title="(editid?((permissionClose||$store.state.ButtonPermission['edit'+modelInfo.code])?'修改':'查看'):'添加')+modelInfo.name" 
 		:visible.sync="dialogFormVisible" width="800px" @close="close" :close-on-click-modal="false">
 			<el-form :model="postForm" ref="postForm" :rules="rules" label-width="100px" :disabled="editid&&!$store.state.ButtonPermission['edit'+modelInfo.code]">
 				<el-form-item v-for="(inputConfig,index) in postFormConfig" :key="index"
@@ -56,8 +60,9 @@
 			<div slot="footer" class="dialog-footer">
 				{{postForm}}
 				<el-button @click="dialogFormVisible = false">取 消</el-button>
-				<el-button type="primary" @click="add" v-if="!editid&&$store.state.ButtonPermission['add'+modelInfo.code]">提 交</el-button>
-				<el-button type="primary" @click="edit" v-if="editid&&$store.state.ButtonPermission['edit'+modelInfo.code]">修 改</el-button>
+				<el-button type="primary" @click="add" v-if="!editid&&module[0]&&(permissionClose||$store.state.ButtonPermission['add'+modelInfo.code])">提 交</el-button>
+				<el-button type="primary" @click="edit" v-if="editid&&module[2]&&(permissionClose||$store.state.ButtonPermission['edit'+modelInfo.code])">修 改</el-button>
+				<slot name="postFormButton" :data="{editid,postForm,getPageInfo}"></slot>
 			</div>
 		</el-dialog>
 	</div>
@@ -70,26 +75,44 @@
 		props: {
 			modelInfo:{
 				type:Object,
-				default:{
-					name:"",
-					code:""
+				default:()=>{
+					return true;
 				}
+			},
+			module:{
+				type:Array,
+				default:()=>{
+					//增，删，改，查,搜索
+					return [true,true,true,true,true];
+				}
+			},
+			permissionClose:{
+				type:Boolean,
+				default:false
 			},
 			paramFormConfig: {
 				type: Array,
-				default:[]
+				default:()=>{
+					return [];
+				}
 			},
 			postFormConfig:{
 				type: Array,
-				default:[]
+				default:()=>{
+					return [];
+				}
 			},
 			tableConfig:{
 				type: Array,
-				default:[]
+				default:()=>{
+					return [];
+				}
 			},
 			rules:{
 				type: Object,
-				default:{}
+				default:()=>{
+					return {};
+				}
 			},
 		},
 		name: 'fc-list',
